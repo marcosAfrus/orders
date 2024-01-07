@@ -4,20 +4,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.unir.products.model.pojo.ProductDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.unir.products.model.pojo.Product;
 import com.unir.products.model.request.CreateProductRequest;
@@ -42,10 +38,19 @@ public class ProductsController {
     @ApiResponse(
             responseCode = "200",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)))
-    public ResponseEntity<List<Product>> getProducts(@RequestHeader Map<String, String> headers) {
+    public ResponseEntity<List<Product>> getProducts(
+            @RequestHeader Map<String, String> headers,
+            @Parameter(name = "name", description = "Nombre del producto. No tiene por que ser exacto", example = "iPhone", required = false)
+            @RequestParam(required = false) String name,
+            @Parameter(name = "country", description = "País del producto. Debe ser exacto", example = "ES", required = false)
+            @RequestParam(required = false) String country,
+            @Parameter(name = "description", description = "Descripcion del producto. No tiene por que ser exacta", example = "Estupendo", required = false)
+            @RequestParam(required = false) String description,
+            @Parameter(name = "visible", description = "Estado del producto. true o false", example = "true", required = false)
+            @RequestParam(required = false) Boolean visible) {
 
         log.info("headers: {}", headers);
-        List<Product> products = service.getProducts();
+        List<Product> products = service.getProducts(name, country, description, visible);
 
         if (products != null) {
             return ResponseEntity.ok(products);
@@ -132,7 +137,60 @@ public class ProductsController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
 
+
+    @PatchMapping("/products/{productId}")
+    @Operation(
+            operationId = "Modificar parcialmente un producto",
+            description = "RFC 7386. Operacion de escritura",
+            summary = "RFC 7386. Se modifica parcialmente un producto.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Datos del producto a crear.",
+                    required = true,
+                    content = @Content(mediaType = "application/merge-patch+json", schema = @Schema(implementation = String.class))))
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)))
+    @ApiResponse(
+            responseCode = "400",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class)),
+            description = "Producto inválido o datos incorrectos introducidos.")
+    public ResponseEntity<Product> patchProduct(@PathVariable String productId, @RequestBody String patchBody) {
+
+        Product patched = service.updateProduct(productId, patchBody);
+        if (patched != null) {
+            return ResponseEntity.ok(patched);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
+    @PutMapping("/products/{productId}")
+    @Operation(
+            operationId = "Modificar totalmente un producto",
+            description = "Operacion de escritura",
+            summary = "Se modifica totalmente un producto.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Datos del producto a actualizar.",
+                    required = true,
+                    content = @Content(mediaType = "application/merge-patch+json", schema = @Schema(implementation = ProductDto.class))))
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)))
+    @ApiResponse(
+            responseCode = "404",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class)),
+            description = "Producto no encontrado.")
+    public ResponseEntity<Product> updateProduct(@PathVariable String productId, @RequestBody ProductDto body) {
+
+        Product updated = service.updateProduct(productId, body);
+        if (updated != null) {
+            return ResponseEntity.ok(updated);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

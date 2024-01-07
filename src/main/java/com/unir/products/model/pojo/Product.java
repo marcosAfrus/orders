@@ -39,4 +39,11 @@ public class Product {
 	@Column(name = "visible")
 	private Boolean visible;
 
+	public void update(ProductDto productDto) {
+		this.name = productDto.getName();
+		this.country = productDto.getCountry();
+		this.description = productDto.getDescription();
+		this.visible = productDto.getVisible();
+	}
+
 }
