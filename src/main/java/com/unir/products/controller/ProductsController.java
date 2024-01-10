@@ -128,7 +128,7 @@ public class ProductsController {
             responseCode = "404",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class)),
             description = "No se ha encontrado el producto con el identificador indicado.")
-    public ResponseEntity<Product> getProduct(@RequestBody CreateProductRequest request) {
+    public ResponseEntity<Product> addProduct(@RequestBody CreateProductRequest request) {
 
         Product createdProduct = service.createProduct(request);
 
