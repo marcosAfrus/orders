@@ -13,37 +13,33 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "products")
+@Table(name = "order")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ToString
-public class Product {
+public class Order {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long orderId;
 	
-	@Column(name = "name", unique = true)
-	private String name;
+	@Column(name = "userName", nullable = false)
+	private String userName;
 	
-	@Column(name = "country")
-	private String country;
-	
-	@Column(name = "description")
-	private String description;
-	
-	@Column(name = "visible")
-	private Boolean visible;
+	@Column(name = "status", nullable = false)
+	private String status;
 
-	public void update(ProductDto productDto) {
-		this.name = productDto.getName();
-		this.country = productDto.getCountry();
-		this.description = productDto.getDescription();
-		this.visible = productDto.getVisible();
-	}
+	@Column(name = "totalPay", nullable = false)
+	private Double totalPay;
+
+	@Column(name = "addressDeliver", nullable = true)
+	private String addressDeliver;
+
 
 }

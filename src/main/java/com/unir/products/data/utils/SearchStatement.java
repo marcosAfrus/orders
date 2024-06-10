@@ -12,4 +12,5 @@ public class SearchStatement {
     private String key;
     private Object value;
     private SearchOperation operation;
+
 }
