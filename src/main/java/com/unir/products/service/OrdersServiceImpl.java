@@ -49,12 +49,17 @@ public class OrdersServiceImpl implements OrdersService {
 	public Order createOrder(CreateOrderRequest request) {
 
 		//Otra opcion: Jakarta Validation: https://www.baeldung.com/java-validation
-		if (request != null) {
+		if (request != null &&
+			request.getUserName() != null &&
+			request.getStatus() != null &&
+			request.getTotalPay() != null) {
+
 			log.info("Request received for order {}", request.userName);
 			Order order = Order.builder()
-					.userName(request.userName)
-					.status(request.status)
-					.totalPay(request.totalPay)
+					.userName(request.getUserName())
+					.status(request.getStatus())
+					.totalPay(request.getTotalPay())
+					.addressDeliver(request.getAddressDeliver())
 					.build();
 			return repository.save(order);
 		} else {
