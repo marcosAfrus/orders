@@ -14,4 +14,6 @@ public interface OrdersService {
 	Order createOrder(CreateOrderRequest request);
 
 	Order updateOrder(String productId, String updateRequest);
+
+	Order cancelOrder(String productId);
 }

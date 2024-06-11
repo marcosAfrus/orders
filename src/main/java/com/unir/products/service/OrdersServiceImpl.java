@@ -2,6 +2,7 @@ package com.unir.products.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -52,7 +53,9 @@ public class OrdersServiceImpl implements OrdersService {
 		if (request != null &&
 			request.getUserName() != null &&
 			request.getStatus() != null &&
-			request.getTotalPay() != null) {
+			request.getTotalPay() != null &&
+			request.getProducts() != null) {
+
 
 			log.info("Request received for order {}", request.userName);
 			Order order = Order.builder()
@@ -60,6 +63,7 @@ public class OrdersServiceImpl implements OrdersService {
 					.status(request.getStatus())
 					.totalPay(request.getTotalPay())
 					.addressDeliver(request.getAddressDeliver())
+					.products(request.getProducts())
 					.build();
 			return repository.save(order);
 		} else {
@@ -68,8 +72,50 @@ public class OrdersServiceImpl implements OrdersService {
 	}
 
 	@Override
-	public Order updateOrder(String productId, String updateRequest) {
-		return null;
+	public Order updateOrder(String orderId, String request) {
+		//PATCH se implementa en este caso mediante Merge Patch: https://datatracker.ietf.org/doc/html/rfc7386
+		Order order = repository.getById(Long.valueOf(orderId));
+		if (order != null) {
+			log.error("Request updating product {}", order.getStatus());
+			if (Objects.equals(order.getStatus(), "Pagado") || Objects.equals(order.getStatus(), "Cancelado"))
+			{
+				return null;
+			}
+			else
+			{
+				try {
+					JsonMergePatch jsonMergePatch = JsonMergePatch.fromJson(objectMapper.readTree(request));
+					JsonNode target = jsonMergePatch.apply(objectMapper.readTree(objectMapper.writeValueAsString(order)));
+					Order patched = objectMapper.treeToValue(target, Order.class);
+					repository.save(patched);
+					return patched;
+				} catch (JsonProcessingException | JsonPatchException e) {
+					log.error("Error updating product {}", orderId, e);
+					return null;
+				}
+			}
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Order cancelOrder(String orderId) {
+		Order order = repository.getById(Long.valueOf(orderId));
+		if (order != null) {
+			log.error("Request updating product {}", order.getStatus());
+			if (!Objects.equals(order.getStatus(), "Pagado"))
+			{
+				return null;
+			}
+			else
+			{
+
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 
 }

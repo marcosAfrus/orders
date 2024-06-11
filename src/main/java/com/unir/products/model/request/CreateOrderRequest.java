@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,5 +17,6 @@ public class CreateOrderRequest {
 	public String status;
 	public Double totalPay;
 	public String addressDeliver;
+	public List<String> products;
 
 }

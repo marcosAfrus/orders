@@ -1,11 +1,6 @@
 package com.unir.products.model.pojo;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -41,5 +36,7 @@ public class Order {
 	@Column(name = "addressDeliver", nullable = true)
 	private String addressDeliver;
 
-
+	@ElementCollection
+	@Column(name = "products")
+	private List<String> products;
 }

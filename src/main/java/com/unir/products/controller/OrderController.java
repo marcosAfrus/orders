@@ -124,9 +124,31 @@ public class OrderController {
             responseCode = "400",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class)),
             description = "Producto inválido o datos incorrectos introducidos.")
-    public ResponseEntity<Order> patchProduct(@PathVariable String productId, @RequestBody String patchBody) {
+    public ResponseEntity<Order> patchOrder(@PathVariable String orderId, @RequestBody String patchBody) {
 
-        Order patched = service.updateOrder(productId, patchBody);
+        Order patched = service.updateOrder(orderId, patchBody);
+        if (patched != null) {
+            return ResponseEntity.ok(patched);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/orders/cancel/{orderId}")
+    @Operation(
+            operationId = "Cancelar una orden",
+            description = "Operacion de escritura",
+            summary = " Se modifica parcialmente una orden.")
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Order.class)))
+    @ApiResponse(
+            responseCode = "400",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class)),
+            description = "Producto inválido o datos incorrectos introducidos.")
+    public ResponseEntity<Order> cancelOrder(@PathVariable String orderId) {
+
+        Order patched = service.cancelOrder(orderId);
         if (patched != null) {
             return ResponseEntity.ok(patched);
         } else {
